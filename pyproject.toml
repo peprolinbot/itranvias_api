@@ -1,0 +1,24 @@
+[project]
+version = "v0.1.0"
+keywords = ['bus', 'buses', 'transport', 'public transport', 'galicia', 'api']
+name = "itranvias_api"
+description = "Python API wrapper for the city of A Coruña public transport"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "GPL-3.0-or-later"
+authors = [{ name = "Pedro Rey Anca", email = "contact@peprolinbot.com" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = ["requests>=2.32.3"]
+
+[project.urls]
+homepage = "https://github.com/peprolinbot/itranvias_api"
+documentation = "https://peprolinbot.github.io/itranvias_api"
+repository = "https://github.com/peprolinbot/itranvias_api"
+
+[project.scripts]
+itranvias-cli = "itranvias_api.__main__:main"
