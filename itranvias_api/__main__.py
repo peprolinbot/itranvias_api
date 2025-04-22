@@ -85,7 +85,7 @@ def main() -> None:
     elif args.command == "line":
         routes = api.lines.get_line_buses(args.line_id)
         route = routes[args.route_id]
-        route.stops = STATIC_DATA["lines"][args.line_id].routes[0].stops
+        route.stops = STATIC_DATA["lines"][args.line_id].routes[args.route_id].stops
         display_route_stops_and_buses(route)
 
 
