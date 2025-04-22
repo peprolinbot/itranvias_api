@@ -1,5 +1,5 @@
 [project]
-version = "v0.1.0"
+version = "v0.1.1"
 keywords = ['bus', 'buses', 'transport', 'public transport', 'galicia', 'api']
 name = "itranvias_api"
 description = "Python API wrapper for the city of A Coruña public transport"
