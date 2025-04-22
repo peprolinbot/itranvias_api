@@ -23,7 +23,7 @@ def display_next_buses(buses_data: dict) -> None:
             print(f"Line {line_id_to_name(line_id)}:")
             for bus in buses:
                 print(
-                    f"{" "*4}- 🚍 {bus.id} | 📍 {bus.distance}m | ⌛ {bus.time} minutes"
+                    f"{" "*4}- 🚍 {bus.id:>3} | 📍 {bus.distance:<6} m | ⌛ {bus.time:>2} minutes"
                 )
     else:
         print("It looks like there are no buses for this stop")
@@ -41,7 +41,8 @@ def display_route_stops_and_buses(route: api.models.Route) -> None:
             bus_str = f"[🚍 {bus.id}]"
 
             if bus.at_stop:
-                stop_str = f"{bus_str} - {stop_str}"  # We add the bus to the left of the stop string
+                # We add the bus to the left of the stop string
+                stop_str = f"{bus_str} - {stop_str}"
             else:
                 buses_str += f"{bus_str}\n{" "*4}|"
 
@@ -66,7 +67,8 @@ def main() -> None:
     line_parser = subparsers.add_parser(
         "line", help="Get buses and stops 'diagram' for a specific line and route."
     )
-    line_parser.add_argument("line_id", type=int, help="The bus line id to query.")
+    line_parser.add_argument(
+        "line_id", type=int, help="The bus line id to query.")
     line_parser.add_argument(
         "route_id",
         type=int,
@@ -76,6 +78,8 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "stop":
+        print(f"Buses for stop {args.stop_id} ({
+              stop_id_to_name(args.stop_id)}):\n")
         next_buses = api.stops.get_stop_buses(args.stop_id)
         display_next_buses(next_buses)
     elif args.command == "line":
