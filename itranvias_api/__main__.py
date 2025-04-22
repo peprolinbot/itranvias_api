@@ -1,8 +1,3 @@
-"""
-@public
-hi
-"""
-
 import argparse
 import itranvias_api.queryitr as api
 
