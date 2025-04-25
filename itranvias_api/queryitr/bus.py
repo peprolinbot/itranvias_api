@@ -12,17 +12,14 @@ def get_working_buses() -> dict[int, Bus]:
     """
     lines = get_all_lines()
     buses = {}
-    count = 0 # count to sleep to avoid 429
     while True:
         try:
             while lines != {}:
                 line_id = next(iter(lines)) 
-                print(line_id)
                 response = _queryitr_adapter.get(func=2, dato=line_id)
                 lines.pop(line_id)
                 data = response.data
                 for route in data["paradas"]:
-                    count += 1
                     for stop in route["paradas"]:
                         for bus in stop["buses"]:
                             bus_id = bus["bus"]
@@ -34,9 +31,7 @@ def get_working_buses() -> dict[int, Bus]:
                                     last_stop=Stop(stop["parada"]),
                                 )
                                 buses[bus_id] = ob_bus
-                    print(buses)
                 sleep(1)
             return sorted(buses.values(), key=lambda b: b.id)
         except QueryItrError:
-            print("error")
             sleep(15)
