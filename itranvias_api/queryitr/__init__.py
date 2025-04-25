@@ -31,6 +31,7 @@ from . import lines
 from . import stops
 from . import info
 from . import models
+from . import bus
 
 
-__all__ = ["lines", "stops", "info", "models"]
+__all__ = ["lines", "stops", "info", "models", "bus"]
