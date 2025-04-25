@@ -4,6 +4,11 @@ from .lines import get_all_lines
 from time import sleep
 
 def get_working_buses() -> dict[int, Bus]:
+    """
+    Get all buses that are working now
+
+    :return: A dict of `Bus`es with keys the bus id
+    """
     lines = get_all_lines()
     buses = {}
     count = 0 # count to sleep to avoid 429
