@@ -27,10 +27,12 @@ from .known_servers import ITRANVIAS_WEB as _QUERYITR_URL
 
 _queryitr_adapter = _QueryItrAdapter(_QUERYITR_URL)
 
-from . import lines
-from . import stops
-from . import info
-from . import models
+# from . import lines
+# from . import stops
+# from . import info
+# from . import models
 
 
-__all__ = ["lines", "stops", "info", "models"]
+# __all__ = ["lines", "stops", "info", "models"]
+
+from . import cached

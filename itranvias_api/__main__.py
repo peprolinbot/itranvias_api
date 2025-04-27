@@ -62,8 +62,7 @@ def main() -> None:
     line_parser = subparsers.add_parser(
         "line", help="Get buses and stops 'diagram' for a specific line and route."
     )
-    line_parser.add_argument(
-        "line_id", type=int, help="The bus line id to query.")
+    line_parser.add_argument("line_id", type=int, help="The bus line id to query.")
     line_parser.add_argument(
         "route_id",
         type=int,
@@ -73,8 +72,10 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "stop":
-        print(f"Buses for stop {args.stop_id} ({
-              stop_id_to_name(args.stop_id)}):\n")
+        print(
+            f"Buses for stop {args.stop_id} ({
+              stop_id_to_name(args.stop_id)}):\n"
+        )
         next_buses = api.stops.get_stop_buses(args.stop_id)
         display_next_buses(next_buses)
     elif args.command == "line":
