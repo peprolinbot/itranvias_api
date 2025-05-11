@@ -153,6 +153,16 @@ class Stop(Base):
     def __repr__(self) -> str:
         return f"ID: {self.id} - Name: {self.name or '?'}"
 
+    @classmethod
+    def search(cls, name, session: Session = default_session):
+        """
+        Search for a stop by name (uses SQL `LIKE`)
+
+        :param name: The name to search for
+        """
+
+        return session.query(cls).filter(cls.name.like(f"%{name}%")).all()
+
     def get_next_buses(self, session: Session = default_session) -> dict[int, dict]:
         """
         Fetch information about a stop, including real-time info about buses
