@@ -93,7 +93,7 @@ def get_general_info(
 
             output["stops"][stop_id] = stop
 
-        for line_data in data["actualizacion"]["lineas"]:
+        for priority, line_data in enumerate(data["actualizacion"]["lineas"]):
             routes = []
             for route_data in line_data["rutas"]:
                 route_id = route_data["ruta"]
@@ -132,6 +132,7 @@ def get_general_info(
             line, _ = get_or_create(session, Line, id=line_id)
 
             line.name = line_data["lin_comer"]
+            line.priority = priority
 
             route.origin = (
                 session.query(Stop).filter_by(name=line_data["nombre_orig"]).first()

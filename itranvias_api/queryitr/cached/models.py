@@ -250,6 +250,9 @@ class Line(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    priority = Column(
+        Integer, unique=True
+    )  # Where this line would be in a list of all lines (lower value means higher priority)
     origin_id = Column(Integer, ForeignKey("stops.id"))
     destination_id = Column(Integer, ForeignKey("stops.id"))
     color = Column(String)
