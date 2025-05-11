@@ -284,6 +284,10 @@ class Line(Base):
     def __repr__(self):
         return f"Line - ID: {self.id} - Name: {self.name or '?'}"
 
+    @classmethod
+    def get_all(cls, session: Session = default_session):
+        return session.query(cls).order_by(cls.priority)
+
     def get_buses(self, session: Session=default_session) -> dict:
         """
         Fetch real-time information about about a line's buses
