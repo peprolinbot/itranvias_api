@@ -1,12 +1,15 @@
+from sqlalchemy.orm import Session
+
 from .. import _queryitr_adapter
 from .models import Line, Route, Stop, NewsMessage, Fare, RouteStop
 from .utils import get_or_create
+from .database import default_session
 
 from datetime import datetime
 
 
 def get_general_info(
-    session,
+    session: Session = default_session,
     last_request_date: datetime = datetime(2016, 1, 1),
     last_message_id: int = 0,
     last_message_date: datetime = datetime(2016, 1, 1),
@@ -101,8 +104,16 @@ def get_general_info(
 
                 with session.no_autoflush:
                     for position, stop_id in enumerate(route_data["paradas"]):
-                        stop=session.query(Stop).filter_by(id=stop_id).first() # It has to exist, we created all of them before
-                        new_route_stop = get_or_create(session, RouteStop, route=route, stop=stop, position=position)
+                        stop = (
+                            session.query(Stop).filter_by(id=stop_id).first()
+                        )  # It has to exist, we created all of them before
+                        new_route_stop = get_or_create(
+                            session,
+                            RouteStop,
+                            route=route,
+                            stop=stop,
+                            position=position,
+                        )
 
                 route.origin = (
                     session.query(Stop)

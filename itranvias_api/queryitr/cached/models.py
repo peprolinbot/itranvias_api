@@ -8,16 +8,14 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
     Numeric,
-    Table
+    Table,
 )
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, declarative_base
-import os
+from sqlalchemy.orm import relationship, Session
 
 from .utils import get_or_create, line_route_id_to_route_id
 from .. import _queryitr_adapter
-
-Base = declarative_base()
+from .database import default_db, default_session, Base
 
 # Association table for the many-to-many relationship
 line_stop = Table(
@@ -139,7 +137,7 @@ class Stop(Base):
     connections = relationship("Line", secondary="line_stop", back_populates="stops")
 
     route_stops = relationship("RouteStop", back_populates="stop")
-    
+
     @hybrid_property
     def routes(self):
         return [route_stop.route for route_stop in self.route_stops]
@@ -155,13 +153,13 @@ class Stop(Base):
     def __repr__(self) -> str:
         return f"ID: {self.id} - Name: {self.name or '?'}"
 
-    def get_next_buses(self, session: "Session") -> dict[int, list[RTBus]]:
+    def get_next_buses(self, session: Session = default_session) -> dict[int, dict]:
         """
         Fetch information about a stop, including real-time info about buses
 
         :param session: The database session
 
-        :return: A dictionary with keys the line ids that go trough that stop, each having a list of `RTBus`es
+        :return: A dictionary with keys the line ids that go trough that stop, each having a dict with `buses: list[RTBus]` and `line: Line`
         """
 
         response = _queryitr_adapter.get(func=0, dato=self.id)
@@ -199,8 +197,7 @@ class Stop(Base):
 
                 buses.append(rt_bus)
 
-            lines[line_id] = buses
-            # lines[line_id] = {"line": line, "buses": buses}
+            lines[line_id] = {"line": line, "buses": buses}
 
         session.commit()
         return lines
@@ -223,7 +220,7 @@ class Route(Base):
         "RouteStop",
         back_populates="route",
         order_by="RouteStop.position",
-    ) # list[RouteStop]
+    )  # list[RouteStop]
 
     buses = relationship("Bus", back_populates="route")
 
@@ -284,10 +281,10 @@ class Line(Base):
     def __repr__(self):
         return f"Line - ID: {self.id} - Name: {self.name or '?'}"
 
-    def get_buses(self, session: "Session") -> dict:
+    def get_buses(self, session: Session=default_session) -> dict:
         """
         Fetch real-time information about about a line's buses
-        
+
         TODO DESCRIBE THE OUTPUT DICT
 
         :return: A dict with keys the route ids (usually 0 outbound/ida, 1 return/vuelta), each containig a route with buses in that line (`id`, `last_stop` (id), `state` and `route_progress`)
@@ -305,9 +302,9 @@ class Line(Base):
             stops = {}
             for stop_data in route_data["paradas"]:
                 stop_id = stop_data["parada"]
-                stop,_=get_or_create(session, Stop, id=stop_id)
+                stop, _ = get_or_create(session, Stop, id=stop_id)
 
-                stops[stop_id] = {"stop":stop, "buses": {"at_stop": [], "moving":[]}}
+                stops[stop_id] = {"stop": stop, "buses": {"at_stop": [], "moving": []}}
                 for bus_data in stop_data["buses"]:
                     bus_id = bus_data["bus"]
 
@@ -391,3 +388,6 @@ class Fare(Base):
 
     def __repr__(self) -> str:
         return f"{self.name} ({self.price}€)"
+
+
+default_db.initialize_database()

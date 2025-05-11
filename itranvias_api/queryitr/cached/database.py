@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.exc import SQLAlchemyError
-import os
-from .models import Base
+from sqlalchemy.orm import declarative_base
+Base = declarative_base()
 
 
 class Database:
@@ -39,3 +39,7 @@ class Database:
         """
 
         self.Session.remove()
+
+default_db = Database("/tmp/itrdb.sqlite3")
+default_db.initialize_database()
+default_session = default_db.get_session()
