@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from .. import _queryitr_adapter
+from ..direct.info import get_general_info
 from .models import Line, Route, Stop, NewsMessage, Fare, RouteStop
 from .utils import get_or_create
 from .database import default_session
@@ -8,7 +8,7 @@ from .database import default_session
 from datetime import datetime
 
 
-def get_general_info(
+def update_general_info(
     session: Session = default_session,
     last_request_date: datetime = datetime(2016, 1, 1),
     last_message_id: int = 0,
@@ -17,7 +17,7 @@ def get_general_info(
     fix_route_id: bool = True,
 ) -> dict:
     """
-    Get general/"static" info about th iTranvías app news, lines, stops and fares. This is what the official client uses to update its database/cache of in-browser data
+    Get general/"static" info about the iTranvías app news, lines, stops and fares. This is what the official client uses to update its database/cache of in-browser data
 
     Note that:
     - A news message is shown if its id is lower than `last_message_id` or its date previous to `last_message_date`
@@ -43,9 +43,7 @@ def get_general_info(
         - `observations`: A list of strings with some observations about the pricing, like transfers and special price for children
     """
 
-    dato = f"{last_request_date.strftime('%Y%m%dT%H%M%S')}_{language}_{last_message_id}_{
-        last_message_date.strftime('%Y%m%dT%H%M%S')}"
-    response = _queryitr_adapter.get(func=7, dato=dato)
+    response = get_general_info(*args, **kwargs)
     data = response.data["iTranvias"]
 
     output = {

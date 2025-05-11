@@ -13,8 +13,9 @@ from sqlalchemy import (
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, Session
 
+from ..direct.stops import get_stop_buses
+from ..direct.lines import get_line_buses
 from .utils import get_or_create, line_route_id_to_route_id
-from .. import _queryitr_adapter
 from .database import default_db, default_session, Base
 
 # Association table for the many-to-many relationship
@@ -172,7 +173,7 @@ class Stop(Base):
         :return: A dictionary with keys the line ids that go trough that stop, each having a dict with `buses: list[RTBus]` and `line: Line`
         """
 
-        response = _queryitr_adapter.get(func=0, dato=self.id)
+        response = get_stop_buses(self.id)
         data = response.data
 
         lines = {}
@@ -307,7 +308,7 @@ class Line(Base):
         :return: A dict with keys the route ids (usually 0 outbound/ida, 1 return/vuelta), each containig a route with buses in that line (`id`, `last_stop` (id), `state` and `route_progress`)
         """
 
-        response = _queryitr_adapter.get(func=2, dato=self.id)
+        response = get_line_buses(self.id)
         data = response.data
 
         routes = {}
