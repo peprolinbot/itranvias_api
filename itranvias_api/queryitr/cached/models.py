@@ -10,6 +10,7 @@ from sqlalchemy import (
     Numeric,
     Table
 )
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, declarative_base
 import os
 
@@ -34,8 +35,8 @@ class RouteStop(Base):
     stop_id = Column(Integer, ForeignKey("stops.id"), primary_key=True)
     position = Column(Integer, nullable=False)  # Position of the stop on this line
 
-    route = relationship("Route", back_populates="stops")
-    stop = relationship("Stop", back_populates="routes")
+    route = relationship("Route", back_populates="route_stops")
+    stop = relationship("Stop", back_populates="route_stops")
 
 
 class Bus(Base):
@@ -137,7 +138,11 @@ class Stop(Base):
 
     connections = relationship("Line", secondary="line_stop", back_populates="stops")
 
-    routes = relationship("RouteStop", back_populates="stop")
+    route_stops = relationship("RouteStop", back_populates="stop")
+    
+    @hybrid_property
+    def routes(self):
+        return [route_stop.route for route_stop in self.route_stops]
 
     def __init__(
         self, id: int, name: str = None, lat: float = None, long: float = None
@@ -207,26 +212,24 @@ class Route(Base):
     id = Column(Integer, primary_key=True)  # Full route ID
     origin_id = Column(Integer, ForeignKey("stops.id"))
     destination_id = Column(Integer, ForeignKey("stops.id"))
-    path = Column(String)  # You might want to use a different type for path
+    path = Column(String)  # TODO: You might want to use a different type for path
     line_id = Column(Integer, ForeignKey("lines.id"))
     line = relationship("Line", foreign_keys=[line_id])
 
     origin = relationship("Stop", foreign_keys=[origin_id])
     destination = relationship("Stop", foreign_keys=[destination_id])
 
-    # stops = relationship(
-    #     "Stop",
-    #     secondary="route_stops",
-    #     order_by="RouteStop.position",
-    #     back_populates="routes",
-    # )
-    stops = relationship(
+    route_stops = relationship(
         "RouteStop",
         back_populates="route",
         order_by="RouteStop.position",
-    )
+    ) # list[RouteStop]
 
     buses = relationship("Bus", back_populates="route")
+
+    @hybrid_property
+    def stops(self):
+        return [route_stop.stop for route_stop in self.route_stops]
 
     def __init__(self, id: int, origin: Stop = None, destination: Stop = None):
         self.id = id
