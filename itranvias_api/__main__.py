@@ -4,7 +4,7 @@ hi
 """
 
 import argparse
-import itranvias_api.queryitr as api
+import queryitr as api
 
 STATIC_DATA = api.info.get_general_info()
 
