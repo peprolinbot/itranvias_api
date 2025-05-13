@@ -10,4 +10,4 @@ def get_or_create(session, model, **kwargs):
 
 
 def line_route_id_to_route_id(line_id: int, route_line_id: int) -> int:
-    return line_id * 10000 + route_line_id
+    return line_id * 100 + route_line_id
