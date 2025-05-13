@@ -1,37 +1,15 @@
 from sqlalchemy.orm import Session
-
-from ..direct.info import get_general_info
-from .models import Line, Route, Stop, NewsMessage, Fare, RouteStop
-from .utils import get_or_create
-from .database import default_session
-
 from datetime import datetime
 
+from ..direct.info import get_general_info
+from .models import Line, Route, Stop, NewsMessage, Fare, RouteStop, UpdaterMetadata
+from .utils import get_or_create
+from .database import default_db
 
-def update_general_info(
-    session: Session = default_session,
-    last_request_date: datetime = datetime(2016, 1, 1),
-    last_message_id: int = 0,
-    last_message_date: datetime = datetime(2016, 1, 1),
-    language: str = "en",
-    fix_route_id: bool = True,
-) -> dict:
+
+def update_general_info(session: Session, *args, **kwargs) -> dict:
     """
-    Get general/"static" info about the iTranvías app news, lines, stops and fares. This is what the official client uses to update its database/cache of in-browser data
-
-    Note that:
-    - A news message is shown if its id is lower than `last_message_id` or its date previous to `last_message_date`
-    - Other information is shown if it has changed since `last_request_date`
-
-    :param last_request_date: The date of the last time lines, stops and fares info was consulted.
-
-    :param last_message_id: The id of the last news message received
-
-    :param last_message_date: The date of the last news message received
-
-    :param language: The language to receive the information in
-
-    :param fix_route_id: Wether to fix the route ids the API gives in this endpoints, since the id used everywhere else is the last two digits of this one
+    Calls `itranvias_api.queryitr.direct.info.get_general_info` (all parameters are forwarded) and the output is used to update the database. The returned output is reestructutred as explained below.
 
     :return: A dict with 5 keys:
     - `news`: A list of new (in respect to the given parameters) `itranvias_api.queryitr.models.NewsMessage`s
@@ -75,6 +53,8 @@ def update_general_info(
         output["last_update"] = datetime.strptime(
             data["actualizacion"]["fecha"], "%Y%m%dT%H%M%S"
         )
+        metadata, _ = get_or_create(session, UpdaterMetadata, id=0)
+        metadata.last_updated = output["last_update"]
 
         for stop_data in data["actualizacion"]["paradas"]:
             stop_id = stop_data["id"]
@@ -162,3 +142,25 @@ def update_general_info(
     session.commit()
 
     return output
+
+
+def update_latest_general_info(session: Session, language: str):
+    """
+    Calls `update_general_info` with the according parameters in the database
+    """
+
+    last_message = NewsMessage.get_last()
+    last_message_id = None if last_message is None else last_message.id
+
+    return update_general_info(
+        session=session,
+        last_request_date=UpdaterMetadata.get_default().last_updated,
+        last_message_id=last_message_id,
+        language=language,
+    )
+
+
+default_db.updater = update_latest_general_info
+
+
+# TODO: Get line info thingys here

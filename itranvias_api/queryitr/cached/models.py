@@ -299,7 +299,7 @@ class Line(Base):
     def get_all(cls, session: Session = default_session):
         return session.query(cls).order_by(cls.priority)
 
-    def get_buses(self, session: Session=default_session) -> dict:
+    def get_buses(self, session: Session = default_session) -> dict:
         """
         Fetch real-time information about about a line's buses
 
@@ -374,6 +374,14 @@ class NewsMessage(Base):
         self.title = title
         self.text = text
 
+    @classmethod
+    def get_last(cls, session: Session = default_session):
+        """
+        Get or create the default updater's metadata (id=0)
+        """
+
+        return session.query(cls).order_by(cls.id.desc()).first()
+
     def __repr__(self) -> str:
         return self.title
 
@@ -406,6 +414,24 @@ class Fare(Base):
 
     def __repr__(self) -> str:
         return f"{self.name} ({self.price}€)"
+
+
+class UpdaterMetadata(Base):
+    __tablename__ = "updater_metadata"
+
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime, default=datetime(2016, 1, 1))
+
+    @classmethod
+    def get_default(cls, session: Session = default_session):
+        """
+        Get or create the default updater's metadata (id=0)
+        """
+
+        return get_or_create(session, cls, id=0)[0]
+
+    def __repr__(self):
+        return f"ID: {self.id} | Last updated: {self.last_updated}"
 
 
 default_db.initialize_database()
