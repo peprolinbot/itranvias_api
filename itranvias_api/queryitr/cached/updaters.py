@@ -93,16 +93,8 @@ def update_general_info(session: Session, *args, **kwargs) -> dict:
                             position=position,
                         )
 
-                route.origin = (
-                    session.query(Stop)
-                    .filter_by(name=route_data["nombre_orig"])
-                    .first()
-                )
-                route.destination = (
-                    session.query(Stop)
-                    .filter_by(name=route_data["nombre_dest"])
-                    .first()
-                )
+                route.origin_name = route_data["nombre_orig"]
+                route.destination_name = route_data["nombre_dest"]
 
                 routes.append(route)
 
@@ -112,12 +104,8 @@ def update_general_info(session: Session, *args, **kwargs) -> dict:
             line.name = line_data["lin_comer"]
             line.priority = priority
 
-            route.origin = (
-                session.query(Stop).filter_by(name=line_data["nombre_orig"]).first()
-            )
-            route.destination = (
-                session.query(Stop).filter_by(name=line_data["nombre_dest"]).first()
-            )
+            line.origin_name = line_data["nombre_orig"]
+            line.destination_name = line_data["nombre_dest"]
 
             line.color = line_data["color"]
             line.routes = routes

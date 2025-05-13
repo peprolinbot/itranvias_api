@@ -222,14 +222,12 @@ class Route(AppModelBase):
     __tablename__ = "routes"
 
     id = Column(Integer, primary_key=True)  # Full route ID
-    origin_id = Column(Integer, ForeignKey("stops.id"))
-    destination_id = Column(Integer, ForeignKey("stops.id"))
     path = Column(String)  # TODO: You might want to use a different type for path
     line_id = Column(Integer, ForeignKey("lines.id"))
     line = relationship("Line", foreign_keys=[line_id])
 
-    origin = relationship("Stop", foreign_keys=[origin_id])
-    destination = relationship("Stop", foreign_keys=[destination_id])
+    origin_name = Column(String)
+    destination_name = Column(String)
 
     route_stops = relationship(
         "RouteStop",
@@ -263,12 +261,11 @@ class Line(AppModelBase):
     priority = Column(
         Integer, unique=True
     )  # Where this line would be in a list of all lines (lower value means higher priority)
-    origin_id = Column(Integer, ForeignKey("stops.id"))
-    destination_id = Column(Integer, ForeignKey("stops.id"))
     color = Column(String)
 
-    origin = relationship("Stop", foreign_keys=[origin_id])
-    destination = relationship("Stop", foreign_keys=[destination_id])
+    origin_name = Column(String)
+    destination_name = Column(String)
+
     routes = relationship("Route", back_populates="line")
     stops = relationship(
         "Stop",
