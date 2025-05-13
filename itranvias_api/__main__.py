@@ -72,6 +72,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Get real-time bus information for the city of A Coruña."
     )
+    parser.add_argument("-u","--force-update", action="store_true", help="Force the update of the static data")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Subcommand for querying by stop
@@ -110,7 +111,7 @@ def main() -> None:
 
     api.database.default_db.language = LANGUAGE
 
-    if (datetime.now() - api.models.UpdaterMetadata.get_default().last_updated) > UPDATE_PERIOD:
+    if args.force_update or (datetime.now() - api.models.UpdaterMetadata.get_default().last_updated) > UPDATE_PERIOD:
         api.database.default_db.update() # It's fast after the first time
 
     if args.command == "stop":
