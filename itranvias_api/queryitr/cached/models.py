@@ -18,6 +18,15 @@ from ..direct.lines import get_line_buses
 from .utils import get_or_create, line_route_id_to_route_id
 from .database import default_db, default_session, Base
 
+
+class AppModelBase(Base):
+    __abstract__ = True  # This makes sure this is not mapped to a table
+
+    @classmethod
+    def get_all(cls, session: Session = default_session):
+        return session.query(cls).order_by(cls.id)
+
+
 # Association table for the many-to-many relationship
 line_stop = Table(
     "line_stop",
@@ -38,7 +47,7 @@ class RouteStop(Base):
     stop = relationship("Stop", back_populates="route_stops")
 
 
-class Bus(Base):
+class Bus(AppModelBase):
     __tablename__ = "buses"
 
     id = Column(Integer, primary_key=True)
@@ -127,7 +136,7 @@ class RTBus(Bus):
         return self.state == 0
 
 
-class Stop(Base):
+class Stop(AppModelBase):
     __tablename__ = "stops"
 
     id = Column(Integer, primary_key=True)
@@ -214,7 +223,7 @@ class Stop(Base):
         return lines
 
 
-class Route(Base):
+class Route(AppModelBase):
     __tablename__ = "routes"
 
     id = Column(Integer, primary_key=True)  # Full route ID
@@ -256,7 +265,7 @@ class Route(Base):
         return self.id % 100
 
 
-class Line(Base):
+class Line(AppModelBase):
     __tablename__ = "lines"
 
     id = Column(Integer, primary_key=True)
@@ -351,7 +360,7 @@ class Line(Base):
         return routes
 
 
-class NewsMessage(Base):
+class NewsMessage(AppModelBase):
     __tablename__ = "news_messages"
 
     id = Column(Integer, primary_key=True)
@@ -386,7 +395,7 @@ class NewsMessage(Base):
         return self.title
 
 
-class Fare(Base):
+class Fare(AppModelBase):
     """
     A bus fare
     """
