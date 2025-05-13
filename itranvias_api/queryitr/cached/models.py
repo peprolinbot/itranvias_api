@@ -476,6 +476,7 @@ class UpdaterMetadata(Base):
 
     id = Column(Integer, primary_key=True)
     last_updated = Column(DateTime, default=datetime(2016, 1, 1))
+    language = Column(String)
 
     @classmethod
     def get_default(cls, session: Session = default_session):
@@ -484,6 +485,14 @@ class UpdaterMetadata(Base):
         """
 
         return get_or_create(session, cls, id=0)[0]
+
+    def reset(cls, session: Session = default_session) -> None:
+        """
+        Reset the last_updated value to 01/01/2016
+        """
+
+        self.last_updated = datetime(2016, 1, 1)
+        session.commit()
 
     def __repr__(self):
         return f"ID: {self.id} | Last updated: {self.last_updated}"

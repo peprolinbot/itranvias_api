@@ -152,9 +152,13 @@ def update_latest_general_info(session: Session, language: str):
     last_message = NewsMessage.get_last()
     last_message_id = None if last_message is None else last_message.id
 
+    last_update_metadata = UpdaterMetadata.get_default()
+    if last_update_metadata.language != language:
+        last_updated = datetime(2016, 1, 1)
+
     return update_general_info(
         session=session,
-        last_request_date=UpdaterMetadata.get_default().last_updated,
+        last_request_date=last_updated,
         last_message_id=last_message_id,
         language=language,
     )

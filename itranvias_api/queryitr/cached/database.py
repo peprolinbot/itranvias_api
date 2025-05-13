@@ -48,8 +48,8 @@ class Database:
 
         self.Session.remove()
 
-    def update(self):
-        return self.updater(session=self.get_session(),language=self.language)
+    def update(self, **kwargs):
+        return self.updater(session=self.get_session(),language=self.language,**kwargs)
 
 
 default_db = Database(f"{user_data_dir("itranvias_api","peprolinbot")}.sqlite3")

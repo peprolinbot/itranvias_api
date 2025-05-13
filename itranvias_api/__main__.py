@@ -1,6 +1,8 @@
 import argparse
 import itranvias_api.queryitr.cached as api
 
+LANGUAGE="en"
+
 def display_stop_next_buses(stop_id:int) -> None:
     stop=api.models.Stop.get(stop_id)
     print(f"Buses for {stop.name} ({stop.id}):\n")
@@ -85,6 +87,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    api.database.default_db.language = LANGUAGE
     api.database.default_db.update() # It's fast after the first time
 
     if args.command == "stop":
