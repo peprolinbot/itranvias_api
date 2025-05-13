@@ -125,7 +125,7 @@ class RTBus(Bus):
         Location (latitute)
         """
 
-        self.lat: float = long
+        self.long: float = long
         """
         Location (longitude)
         """
