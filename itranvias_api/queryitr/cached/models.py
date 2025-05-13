@@ -177,12 +177,11 @@ class Stop(AppModelBase):
         :return: A dictionary with keys the line ids that go trough that stop, each having a dict with `buses: list[RTBus]` and `line: Line`
         """
 
-        response = get_stop_buses(self.id)
-        data = response.data
+        data = get_stop_buses(self.id)
 
         lines = {}
 
-        for line_data in data["buses"].get("lineas", []):
+        for line_data in data:
             line_id = line_data["linea"]
             line, _ = get_or_create(session, Line, id=line_id)
 
@@ -291,7 +290,7 @@ class Line(AppModelBase):
 
         :return: A dict with keys the route ids (usually 0 outbound/ida, 1 return/vuelta), each containig a route and stops with buses for which that was their last or actual stop.
             An example output is:
-            ```json
+            ```python
             {
                 0: {
                     'route': <Route>,
@@ -328,11 +327,10 @@ class Line(AppModelBase):
             ```
         """
 
-        response = get_line_buses(self.id)
-        data = response.data
+        data = get_line_buses(self.id)
 
         routes = {}
-        for route_data in data["paradas"]:
+        for route_data in data:
             line_route_id = int(route_data["sentido"])
             route_id = line_route_id_to_route_id(self.id, line_route_id)
             route, _ = get_or_create(session, Route, id=route_id)

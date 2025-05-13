@@ -21,8 +21,7 @@ def update_general_info(session: Session, *args, **kwargs) -> dict:
         - `observations`: A list of strings with some observations about the pricing, like transfers and special price for children
     """
 
-    response = get_general_info(*args, **kwargs)
-    data = response.data["iTranvias"]
+    data = get_general_info(*args, **kwargs)
 
     output = {
         "news": [],
