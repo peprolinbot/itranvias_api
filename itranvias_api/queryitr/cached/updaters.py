@@ -53,8 +53,9 @@ def update_general_info(session: Session, *args, **kwargs) -> dict:
         output["last_update"] = datetime.strptime(
             data["actualizacion"]["fecha"], "%Y%m%dT%H%M%S"
         )
-        metadata, _ = get_or_create(session, UpdaterMetadata, id=0)
-        metadata.last_updated = output["last_update"]
+        metadata, created_metadata = get_or_create(session, UpdaterMetadata, id=0)
+        if not created_metadata:  # It is already by default on creation
+            metadata.last_updated = datetime.now()
 
         for stop_data in data["actualizacion"]["paradas"]:
             stop_id = stop_data["id"]
