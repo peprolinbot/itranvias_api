@@ -320,13 +320,47 @@ class Line(AppModelBase):
 
         return session.query(cls).order_by(cls.priority)
 
-    def get_buses(self, session: Session = default_session) -> dict:
+    def get_buses(self, session: Session = default_session) -> dict[int, dict]:
         """
         Fetch real-time information about about a line's buses
 
-        TODO DESCRIBE THE OUTPUT DICT
-
-        :return: A dict with keys the route ids (usually 0 outbound/ida, 1 return/vuelta), each containig a route with buses in that line (`id`, `last_stop` (id), `state` and `route_progress`)
+        :return: A dict with keys the route ids (usually 0 outbound/ida, 1 return/vuelta), each containig a route and stops with buses for which that was their last or actual stop.
+            An example output is:
+            ```json
+            {
+                0: {
+                    'route': <Route>,
+                    'stops': {
+                        523: {
+                            'stop': <Stop>,
+                            'buses': {
+                                'at_stop': [<Bus>],
+                                'moving': [<Bus>]
+                            }
+                        },
+                        361: {
+                            'stop': <Stop>,
+                            'buses': {
+                                'at_stop': [],
+                                'moving': [<Bus>, <Bus>]
+                            }
+                        }
+                    }
+                },
+                1: {
+                    'route': <Route>,
+                    'stops': {
+                        371: {
+                            'stop': <Stop>,
+                            'buses': {
+                                'at_stop': [<Bus>],
+                                'moving': []
+                            }
+                        }
+                    }
+                }
+            }
+            ```
         """
 
         response = get_line_buses(self.id)
