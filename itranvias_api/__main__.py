@@ -28,6 +28,10 @@ def display_line_stops_and_buses(line_id:int,route_id:int) -> None:
     route = route_data["route"]
     stops_data=route_data["stops"]
 
+    print(
+        f"Line {line.name}, route {route.line_route_id} ({line.origin_name} - {line.destination_name}):\n"
+    )
+
     def bus_str(bus: api.models.RTBus) -> str:
         """Get a bus' string representation"""
         return f"[🚍 {bus.id}]"
