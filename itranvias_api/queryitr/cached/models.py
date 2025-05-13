@@ -23,7 +23,15 @@ class AppModelBase(Base):
     __abstract__ = True  # This makes sure this is not mapped to a table
 
     @classmethod
+    def get(cls, id, session: Session = default_session):
+        """Retrieve by primary key"""
+
+        return session.query(cls).get(id)
+
+    @classmethod
     def get_all(cls, session: Session = default_session):
+        """Get all elements, ordered by id"""
+
         return session.query(cls).order_by(cls.id)
 
 
@@ -306,6 +314,10 @@ class Line(AppModelBase):
 
     @classmethod
     def get_all(cls, session: Session = default_session):
+        """
+        We override this method to show the lines in their "natural order" (1,1A,2,...,UDC)
+        """
+
         return session.query(cls).order_by(cls.priority)
 
     def get_buses(self, session: Session = default_session) -> dict:
