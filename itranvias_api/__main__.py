@@ -89,6 +89,21 @@ def main() -> None:
         help="The route id of the line to query (usually 0 outbound/ida, 1 return/vuelta).",
     )
 
+    # Subcommand for searching
+    search_parser = subparsers.add_parser(
+        "search", help="Search for lines or stops"
+    )
+    search_parser.add_argument(
+        "type",
+        choices=["line", "stop"],
+        help="The type of data to search",
+    )
+    search_parser.add_argument(
+        "query",
+        type=str,
+        help="The search query",
+    )
+
     args = parser.parse_args()
 
     api.database.default_db.language = LANGUAGE
@@ -98,6 +113,16 @@ def main() -> None:
         display_stop_next_buses(args.stop_id)
     elif args.command == "line":
         display_line_stops_and_buses(args.line_id, args.route_id)
+    elif args.command=="search":
+        print("Search results:\n")
+        if args.type=="stop":
+            for stop in api.models.Stop.search(args.query):
+                print(f"- {stop.id} - {stop.name}")
+        elif args.type=="line":
+            for line in api.database.default_session.query(api.models.Line).filter_by(name=args.query):
+                print(
+                    f"- {line.id} - {line.name} ({line.origin_name} - {line.destination_name})"
+                )
 
 
 if __name__ == "__main__":
