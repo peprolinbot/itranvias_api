@@ -64,11 +64,6 @@ class Bus(AppModelBase):
     line_id = Column(Integer, ForeignKey("lines.id"))
     line = relationship("Line", foreign_keys=[line_id])
 
-    def __init__(self, id: int, route: "Route" = None, line: "Line" = None):
-        self.id = id
-        self.line = line
-        self.route = route
-
     def __repr__(self):
         return f"Bus - ID: {self.id}"
 
@@ -160,14 +155,6 @@ class Stop(AppModelBase):
     def routes(self):
         return [route_stop.route for route_stop in self.route_stops]
 
-    def __init__(
-        self, id: int, name: str = None, lat: float = None, long: float = None
-    ):
-        self.id = id
-        self.name = name
-        self.lat = lat
-        self.long = long
-
     def __repr__(self) -> str:
         return f"ID: {self.id} - Name: {self.name or '?'}"
 
@@ -256,11 +243,6 @@ class Route(AppModelBase):
     def stops(self):
         return [route_stop.stop for route_stop in self.route_stops]
 
-    def __init__(self, id: int, origin: Stop = None, destination: Stop = None):
-        self.id = id
-        self.origin = origin
-        self.destination = destination
-
     def __repr__(self):
         return f"Route {self.id} ({'IDA' if self.id == 0 else 'VUELTA' if self.id == 1 else '?'})"
 
@@ -294,20 +276,6 @@ class Line(AppModelBase):
         # Its generated from stops that have this line (not ordered)
         back_populates="connections",
     )
-
-    def __init__(
-        self,
-        id: int,
-        name: str = None,
-        origin: Stop = None,
-        destination: Stop = None,
-        color: str = None,
-    ):
-        self.id = id
-        self.name = name
-        self.origin = origin
-        self.destination = destination
-        self.color = color
 
     def __repr__(self):
         return f"Line - ID: {self.id} - Name: {self.name or '?'}"
@@ -415,20 +383,6 @@ class NewsMessage(AppModelBase):
     title = Column(String)
     text = Column(String)
 
-    def __init__(
-        self,
-        id: int,
-        date: datetime,
-        version: str,
-        title: str,
-        text: str,
-    ):
-        self.id = id
-        self.date = date
-        self.version = version
-        self.title = title
-        self.text = text
-
     @classmethod
     def get_last(cls, session: Session = default_session):
         """
@@ -450,22 +404,13 @@ class Fare(AppModelBase):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False, unique=True)
+    """
+    The fare name/description
+    """
     price = Column(Numeric(3, 2), nullable=False)
-
-    def __init__(
-        self,
-        name: str,
-        price: float,
-    ):
-        self.name: str = name
-        """
-        The fare name/description
-        """
-
-        self.price: float = price
-        """
-        The bus price in euros using this fare (same for all lines)
-        """
+    """
+    The bus price in euros using this fare (same for all lines)
+    """
 
     def __repr__(self) -> str:
         return f"{self.name} ({self.price}€)"
