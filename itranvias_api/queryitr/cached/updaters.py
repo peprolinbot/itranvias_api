@@ -7,9 +7,10 @@ from .utils import get_or_create
 from .database import default_db
 
 
-def update_general_info(session: Session, *args, **kwargs) -> dict:
+def update_general_info(session: Session, *args, language: str, **kwargs) -> dict:
     """
-    Calls `itranvias_api.queryitr.direct.info.get_general_info` (all parameters are forwarded) and the output is used to update the database. The returned output is reestructutred as explained below.
+    Calls `itranvias_api.queryitr.direct.info.get_general_info` (all parameters are forwarded)
+    and the output is used to update the database. The returned output is reestructutred as explained below.
 
     :return: A dict with 5 keys:
     - `news`: A list of new (in respect to the given parameters) `itranvias_api.queryitr.models.NewsMessage`s
@@ -134,7 +135,8 @@ def update_general_info(session: Session, *args, **kwargs) -> dict:
 
 def update_latest_general_info(session: Session, language: str):
     """
-    Calls `update_general_info` with the according parameters in the database
+    Calls `update_general_info` with the `last_updated` parameter taken from the database,
+    but forcing an update if the language changed since the last update
     """
 
     last_message = NewsMessage.get_last()
@@ -143,6 +145,8 @@ def update_latest_general_info(session: Session, language: str):
     last_update_metadata = UpdaterMetadata.get_default()
     if last_update_metadata.language != language:
         last_updated = datetime(2016, 1, 1)
+    else:
+        last_updated = last_update_metadata.last_updated
 
     return update_general_info(
         session=session,
