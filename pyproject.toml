@@ -13,7 +13,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-dependencies = ["requests>=2.32.3", "appdirs>=1.4.4"]
+dependencies = ["requests>=2.32.3", "appdirs>=1.4.4", "SQLAlchemy>=2.0.34"]
 
 [project.urls]
 homepage = "https://github.com/peprolinbot/itranvias_api"
